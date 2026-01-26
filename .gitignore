@@ -205,3 +205,37 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Trained ML models
+*.pkl
+*.h5
+*.joblib
+
+# Dataset files (CSV)
+data/*.csv
+
+# Brain tumor images folder
+data/Brain-tumor/
+
+# Other possible image folders (future-safe)
+data/xray_images/
+data/mri_images/
+
+# Environment variables (if added later)
+.env
+
+# Logs
+*.log
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
