@@ -222,11 +222,9 @@ __pycache__/
 data/*.csv
 
 # Brain tumor images folder
-data/Brain-tumor/
+data/brain_tumor_dataset/
+data/brain_tumor_dataset/**
 
-# Other possible image folders (future-safe)
-data/xray_images/
-data/mri_images/
 
 # Environment variables (if added later)
 .env
