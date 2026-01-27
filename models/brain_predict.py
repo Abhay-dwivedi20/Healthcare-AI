@@ -36,5 +36,5 @@ def predict_brain_tumor(image_path):
 
 # Test run
 if __name__ == "__main__":
-    test_image = r""  # replace with real image path
+    test_image = r"C:\Users\Lenovo\Healthcare-AI\Healthcare-AI\data\brain_tumor_dataset\yes\Y3.jpg"  # replace with real image path
     print(predict_brain_tumor(test_image))
