@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Prediction History{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h3 class="mb-4">📊 Prediction History</h3>
+
+    {% if records %}
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Disease</th>
+                    <th>Prediction</th>
+                    <th>Confidence</th>
+                    <th>Model</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in records %}
+                <tr>
+                    <td>{{ row['id'] }}</td>
+                    <td>{{ row['disease_type']|title }}</td>
+                    <td>{{ row['prediction'] }}</td>
+                    <td>
+    {% if row['confidence'] is not none %}
+        {{ "%.2f"|format(row['confidence'] * 100) }}%
+    {% else %}
+        N/A
+    {% endif %}
+</td>
+
+                    <td>{{ row['model_used'] }}</td>
+                    <td>{{ row['created_at'] }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+        <div class="alert alert-info">No prediction history found.</div>
+    {% endif %}
+
+    <a href="/" class="btn btn-secondary mt-3">⬅ Back Home</a>
+</div>
+{% endblock %}

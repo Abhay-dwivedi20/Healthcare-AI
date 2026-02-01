@@ -2,6 +2,17 @@ from flask import Flask, request, jsonify, render_template
 from werkzeug.utils import secure_filename
 from chatbot.chatbot_engine import chatbot_reply
 from models.brain import predict_brain_tumor
+from database.operations import create_report, create_diagnostic_result
+from database.operations import save_chat_log
+from database.operations import get_all_predictions
+
+
+
+from database.operations import (
+    create_report,
+    create_diagnostic_result,
+    save_chat_log
+)
 
 import cv2
 import numpy as np
@@ -85,40 +96,122 @@ def home():
 def diabetes_form():
     return render_template("diabetes.html")
 
+
 @app.route("/predict/diabetes", methods=["POST"])
 def predict_diabetes():
+    print("🔥 DIABETES ROUTE HIT")
+
     if diabetes_model is None:
+        print("❌ Diabetes model not loaded")
         return render_template("error.html", error="Diabetes model not loaded")
 
-    data = format_diabetes_data(request.form)
-    features = list(data.values())
-    scaled = diabetes_scaler.transform([features])
-    prediction = diabetes_model.predict(scaled)[0]
+    try:
+        # 1️⃣ Get form data
+        data = format_diabetes_data(request.form)
+        print("✅ Form data received:", data)
 
-    confidence = max(diabetes_model.predict_proba(scaled)[0]) if hasattr(diabetes_model, "predict_proba") else 0.85
+        features = list(data.values())
 
-    return render_template("result.html", disease="diabetes",
-                           result={"prediction": prediction, "confidence": confidence, "input_data": data})
+        # 2️⃣ Model prediction
+        scaled = diabetes_scaler.transform([features])
+        prediction = diabetes_model.predict(scaled)[0]
+
+        confidence = (
+            max(diabetes_model.predict_proba(scaled)[0])
+            if hasattr(diabetes_model, "predict_proba")
+            else 0.85
+        )
+
+        print("✅ Prediction done:", prediction, "Confidence:", confidence)
+
+        # 3️⃣ SAVE TO DATABASE
+        print("🔥 ABOUT TO SAVE REPORT")
+
+        report_id = create_report(
+            user_id=None,
+            disease_type="diabetes",
+            input_data=data
+        )
+
+        print("🔥 REPORT SAVED, ID =", report_id)
+
+        create_diagnostic_result(
+            report_id=report_id,
+            prediction="Positive" if prediction == 1 else "Negative",
+            confidence=confidence,
+            model_used="RandomForest"
+        )
+
+        print("🔥 DIAGNOSTIC RESULT SAVED")
+
+        # 4️⃣ Return result page
+        return render_template(
+            "result.html",
+            disease="diabetes",
+            result={
+                "prediction": prediction,
+                "confidence": confidence,
+                "input_data": data
+            }
+        )
+
+    except Exception as e:
+        print("❌ ERROR IN DIABETES ROUTE:", e)
+        return render_template("error.html", error=str(e))
+
 
 # ---------- HEART ----------
 @app.route("/predict/heart", methods=["GET"])
 def heart_form():
     return render_template("heart.html")
 
+
 @app.route("/predict/heart", methods=["POST"])
 def predict_heart():
     if heart_model is None:
         return render_template("error.html", error="Heart model not loaded")
 
+    # 1️⃣ Get form data
     data = format_heart_data(request.form)
     features = list(data.values())
+
+    # 2️⃣ Model prediction
     scaled = heart_scaler.transform([features])
     prediction = heart_model.predict(scaled)[0]
 
-    confidence = max(heart_model.predict_proba(scaled)[0]) if hasattr(heart_model, "predict_proba") else 0.88
+    confidence = (
+        max(heart_model.predict_proba(scaled)[0])
+        if hasattr(heart_model, "predict_proba")
+        else 0.88
+    )
 
-    return render_template("result.html", disease="heart",
-                           result={"prediction": prediction, "confidence": confidence, "input_data": data})
+    # 3️⃣ SAVE TO DATABASE
+    user_id = None  # authentication is future scope
+
+    report_id = create_report(
+        user_id=user_id,
+        disease_type="heart",
+        input_data=data
+    )
+
+    create_diagnostic_result(
+        report_id=report_id,
+        prediction="Positive" if prediction == 1 else "Negative",
+        confidence=confidence,
+        model_used="GaussianNB"
+    )
+
+    # 4️⃣ Return result page
+    return render_template(
+        "result.html",
+        disease="heart",
+        result={
+            "prediction": prediction,
+            "confidence": confidence,
+            "input_data": data
+        }
+    )
+
 
 # ---------- BRAIN ----------
 @app.route("/predict/brain", methods=["GET"])
@@ -126,6 +219,7 @@ def brain_form():
     return render_template("brain.html")
 
 
+# ---------- BRAIN MRI ----------
 @app.route("/predict/brain", methods=["POST"])
 def predict_brain_ui():
     if "mri_image" not in request.files:
@@ -143,14 +237,34 @@ def predict_brain_ui():
     file.save(path)
 
     try:
+        # ML prediction
         prediction_result = predict_brain_tumor(path)
+
+        # Normalize for DB
+        prediction_text = "Positive" if prediction_result == "Tumor Detected" else "Negative"
+
+        # SAVE TO DATABASE
+        user_id = None
+
+        report_id = create_report(
+            user_id=user_id,
+            disease_type="brain",
+            input_data={"filename": filename}
+        )
+
+        create_diagnostic_result(
+            report_id=report_id,
+            prediction=prediction_text,
+            confidence=None,
+            model_used="Feature-based MRI Model"
+        )
 
         return render_template(
             "result.html",
             disease="brain",
             result={
-                "prediction": prediction_result,   # ✅ string is OK here
-                "confidence": None,                # ✅ NOT a string number
+                "prediction": prediction_result,
+                "confidence": None,
                 "input_data": {"filename": filename}
             }
         )
@@ -165,16 +279,30 @@ def predict_brain_ui():
 def chat_page():
     return render_template("chat.html")
 
+
 @app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json if request.is_json else request.form
-    message = data.get("message", "")
+    # Handle both JSON (AJAX) and form submission
+    if request.is_json:
+        data = request.json
+        message = data.get("message", "")
+    else:
+        message = request.form.get("message", "")
 
     if not message:
         return jsonify({"error": "Message required"}), 400
 
+    # Generate chatbot reply
     reply = chatbot_reply(message)
-    return jsonify({"user": message, "bot": reply})
+
+    # ✅ SAVE CHAT TO DATABASE
+    save_chat_log(message, reply)
+
+    return jsonify({
+        "user": message,
+        "bot": reply
+    })
+
 
 # ---------- API (BRAIN FIXED TOO) ----------
 @app.route("/predict/brain", methods=["POST"])
@@ -208,6 +336,12 @@ def predict_brain():
     except Exception as e:
         return render_template("error.html", error=str(e))
 
+
+
+@app.route("/history")
+def prediction_history():
+    records = get_all_predictions()
+    return render_template("history.html", records=records)
 
 # ---------- HEALTH ----------
 @app.route("/health")

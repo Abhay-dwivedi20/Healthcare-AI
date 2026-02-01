@@ -246,3 +246,7 @@ uploads/heart/
 venv/
 __pycache__/
 *.pkl (optional – see below)
+
+# Database
+healthcare.db
+*.db
