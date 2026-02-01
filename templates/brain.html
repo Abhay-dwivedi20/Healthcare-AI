@@ -1,0 +1,76 @@
+<!-- templates/brain.html -->
+{% extends "base.html" %}
+
+{% block title %}Brain Tumor Detection{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h4 class="mb-0">🧠 Brain Tumor Detection</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/predict/brain" enctype="multipart/form-data">
+                    <div class="text-center mb-4">
+                        <div class="mb-3">
+                            <span style="font-size: 4rem;">📁</span>
+                        </div>
+                        <h5>Upload MRI Scan Image</h5>
+                        <p class="text-muted">Supported: JPG, PNG, JPEG | Max: 5MB</p>
+                    </div>
+                    
+                    <!-- File Upload -->
+                    <div class="mb-4">
+                        <label class="form-label">Select MRI Image</label>
+                        <input type="file" class="form-control" name="mri_image" 
+                               accept=".jpg,.jpeg,.png" required>
+                        <div class="form-text">
+                            Upload a clear MRI scan image for tumor detection
+                        </div>
+                    </div>
+                    
+                    <!-- Patient Info (Optional) -->
+                    <div class="mb-3">
+                        <label class="form-label">Patient Age (Optional)</label>
+                        <input type="number" class="form-control" name="patient_age" 
+                               min="1" max="120" placeholder="Optional">
+                    </div>
+                    
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-info btn-lg">
+                            🔬 Analyze MRI Scan
+                        </button>
+                        <a href="/" class="btn btn-outline-secondary ms-2">Cancel</a>
+                    </div>
+                </form>
+                
+                <!-- Sample Images -->
+                <div class="mt-5">
+                    <h6>📸 Sample MRI Images:</h6>
+                    <div class="row mt-3">
+                        <div class="col-md-4 text-center">
+                            <div class="border p-2 rounded">
+                                <small>Normal Brain</small><br>
+                                <small class="text-muted">No tumor detected</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="border p-2 rounded">
+                                <small>Glioma Tumor</small><br>
+                                <small class="text-muted">Common brain tumor</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4 text-center">
+                            <div class="border p-2 rounded">
+                                <small>Meningioma</small><br>
+                                <small class="text-muted">Membrane tumor</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

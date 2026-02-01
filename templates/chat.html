@@ -1,0 +1,158 @@
+<!-- templates/chat.html -->
+{% extends "base.html" %}
+
+{% block title %}Medical Chatbot{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message-input');
+    const chatMessages = document.getElementById('chat-messages');
+    
+    chatForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const message = messageInput.value.trim();
+        
+        if (!message) return;
+        
+        // Add user message
+        addMessage(message, 'user');
+        messageInput.value = '';
+        
+        // Send to server
+        fetch('/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ message: message })
+        })
+        .then(response => response.json())
+        .then(data => {
+            addMessage(data.bot, 'bot');
+        })
+        .catch(error => {
+            addMessage('Sorry, I encountered an error. Please try again.', 'bot');
+        });
+    });
+    
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+        
+        const avatar = sender === 'user' ? '👤' : '🤖';
+        messageDiv.innerHTML = `
+            <div class="d-flex">
+                <div class="me-2">${avatar}</div>
+                <div>
+                    <div class="message-text p-2 rounded">${text}</div>
+                    <small class="text-muted">${new Date().toLocaleTimeString()}</small>
+                </div>
+            </div>
+        `;
+        
+        chatMessages.appendChild(messageDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    // Predefined questions
+    document.querySelectorAll('.quick-question').forEach(button => {
+        button.addEventListener('click', function() {
+            messageInput.value = this.dataset.question;
+        });
+    });
+});
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Chat Interface -->
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">🤖 Healthcare AI Assistant</h5>
+                <span class="badge bg-light text-success">Online</span>
+            </div>
+            
+            <!-- Chat Messages -->
+            <div class="card-body" style="height: 400px; overflow-y: auto;" id="chat-messages">
+                <!-- Welcome Message -->
+                <div class="message bot">
+                    <div class="d-flex">
+                        <div class="me-2">🤖</div>
+                        <div>
+                            <div class="message-text p-2 rounded bg-light">
+                                Hello! I'm your Healthcare AI Assistant. I can help you with:
+                                <ul class="mb-0">
+                                    <li>Disease information (Diabetes, Heart, Brain Tumor)</li>
+                                    <li>Symptoms and precautions</li>
+                                    <li>General health guidance</li>
+                                </ul>
+                                Ask me anything!
+                            </div>
+                            <small class="text-muted">Just now</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input Area -->
+            <div class="card-footer">
+                <form id="chat-form">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="message-input" 
+                               placeholder="Type your health question..." autocomplete="off">
+                        <button class="btn btn-success" type="submit">Send</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Quick Questions Sidebar -->
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h6 class="mb-0">💡 Quick Questions</h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary quick-question" 
+                            data-question="What are diabetes symptoms?">
+                        Diabetes Symptoms
+                    </button>
+                    <button class="btn btn-outline-danger quick-question"
+                            data-question="How to prevent heart disease?">
+                        Heart Disease Prevention
+                    </button>
+                    <button class="btn btn-outline-info quick-question"
+                            data-question="What is brain tumor?">
+                        About Brain Tumor
+                    </button>
+                    <button class="btn btn-outline-success quick-question"
+                            data-question="Healthy diet tips">
+                        Healthy Diet Tips
+                    </button>
+                    <button class="btn btn-outline-warning quick-question"
+                            data-question="When to see a doctor?">
+                        When to See Doctor
+                    </button>
+                </div>
+                
+                <!-- Chat Guidelines -->
+                <div class="mt-4 p-3 bg-light rounded">
+                    <h6>ℹ️ Chat Guidelines:</h6>
+                    <ul class="small mb-0">
+                        <li>For emergencies, call local emergency number</li>
+                        <li>I provide general information only</li>
+                        <li>Always consult real doctor for diagnosis</li>
+                        <li>Be specific with symptoms</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

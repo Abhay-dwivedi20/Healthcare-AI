@@ -1,29 +1,26 @@
-RESPONSES = {
+MEDICAL_KB = {
+    "cardiac arrest": (
+        "Cardiac arrest is a sudden condition where the heart stops beating "
+        "effectively. It is a medical emergency and requires immediate attention."
+    ),
+
     "diabetes": (
-        "Diabetes is a condition where blood sugar levels are high. "
-        "It can be managed with a healthy diet, exercise, and medical guidance."
+        "Diabetes is a condition where the body has difficulty controlling blood sugar levels. "
+        "It can be managed with lifestyle changes and medical care."
     ),
 
-    "heart": (
-        "Heart disease affects how the heart functions. "
-        "Early diagnosis and lifestyle changes are very important."
+    "heart disease": (
+        "Heart disease refers to conditions affecting the heart and blood vessels, "
+        "often related to blocked arteries or heart rhythm problems."
     ),
 
-    "brain": (
-        "A brain tumor is an abnormal growth in the brain. "
-        "MRI scans help in detection, and treatment depends on medical evaluation."
+    "healthy diet": (
+        "A healthy diet includes fruits, vegetables, whole grains, lean proteins, "
+        "and limited sugar, salt, and processed foods."
     ),
 
-    "chest": (
-        "Chest scans help detect lung-related conditions such as infections or abnormalities."
-    ),
-
-    "precaution": (
-        "General precautions include following medical advice, maintaining a healthy lifestyle, "
-        "and consulting a doctor for proper diagnosis."
-    ),
-
-    "emergency": (
-        "If symptoms are severe or sudden, please seek immediate medical attention."
+    "brain tumor": (
+        "A brain tumor is an abnormal growth of cells in the brain. "
+        "Some tumors are benign, while others may require medical treatment."
     )
 }

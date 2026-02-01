@@ -1,24 +1,39 @@
-from transformers import pipeline
+from huggingface_hub import InferenceClient
+import os
 
-# Lightweight free model (no API key)
-generator = pipeline(
-    "text-generation",
-    model="distilgpt2"
+HF_TOKEN = os.getenv("HF_API_TOKEN")  # safer than hardcoding
+
+client = InferenceClient(
+    model="google/flan-t5-base",
+    token=HF_TOKEN
 )
 
-def ask_free_llm(user_message):
-    prompt = (
-        "You are a medical assistant chatbot. "
-        "Give general health information only. "
-        "Do not provide prescriptions.\n\n"
-        f"User: {user_message}\nAssistant:"
-    )
+SYSTEM_PROMPT = """
+You are a healthcare assistant.
+Rules:
+- Answer in simple English.
+- Maximum 3 sentences.
+- Educational information only.
+- No diagnosis, no treatment, no medicines.
+- If question sounds serious, advise seeing a doctor.
+"""
 
-    output = generator(
-        prompt,
-        max_length=80,
-        num_return_sequences=1
-    )
+def generate_llm_response(user_message: str) -> str:
+    prompt = f"""
+{SYSTEM_PROMPT}
 
-    response = output[0]["generated_text"]
-    return response.split("Assistant:")[-1].strip()
+Question: {user_message}
+Answer:
+"""
+    try:
+        response = client.text_generation(
+            prompt,
+            max_new_tokens=120,
+            do_sample=False
+        )
+        return response.strip()
+    except Exception:
+        return (
+            "I can provide general health information only. "
+            "Please consult a qualified doctor for medical advice."
+        )

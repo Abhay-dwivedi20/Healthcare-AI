@@ -237,3 +237,8 @@ data/brain_tumor_dataset/**
 Thumbs.db
 .vscode/
 .idea/
+
+uploads/
+uploads/brain/
+uploads/diabetes/
+uploads/heart/

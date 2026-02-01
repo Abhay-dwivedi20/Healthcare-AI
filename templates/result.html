@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Result{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        <!-- Header -->
+        {% if disease == 'diabetes' %}
+            <div class="card border-primary">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">🩸 Diabetes Prediction Result</h4>
+                </div>
+        {% elif disease == 'heart' %}
+            <div class="card border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">❤️ Heart Disease Prediction Result</h4>
+                </div>
+        {% elif disease == 'brain' %}
+            <div class="card border-info">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">🧠 Brain Tumor Detection Result</h4>
+                </div>
+        {% endif %}
+
+        <div class="card-body">
+
+            <!-- ================= RESULT STATUS ================= -->
+            <div class="text-center py-4">
+                {% if result.prediction == 1 or result.prediction == "Tumor Detected" %}
+                    <div class="alert alert-danger">
+                        <h3>⚠️ Risk Detected</h3>
+                        <h5>Potential {{ disease|title }} detected</h5>
+                    </div>
+                    <div style="font-size: 4rem;">⚠️</div>
+                {% else %}
+                    <div class="alert alert-success">
+                        <h3>✅ No Risk Detected</h3>
+                        <h5>No signs of {{ disease|title }} found</h5>
+                    </div>
+                    <div style="font-size: 4rem;">✅</div>
+                {% endif %}
+            </div>
+
+            <!-- ================= CONFIDENCE ================= -->
+            {% if result.confidence is not none %}
+            <div class="mt-4">
+                <div class="progress" style="height: 28px;">
+                    <div class="progress-bar 
+                        {% if result.prediction == 1 or result.prediction == "Tumor Detected" %}
+                            bg-danger
+                        {% else %}
+                            bg-success
+                        {% endif %}"
+                        role="progressbar"
+                        style="width: {{ result.confidence * 100 }}%">
+                        {{ (result.confidence * 100) | round(1) }}% Confidence
+                    </div>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    Model confidence score
+                </small>
+            </div>
+            {% else %}
+            <div class="mt-4 text-muted">
+                <em>Confidence score not available for this model.</em>
+            </div>
+            {% endif %}
+
+            <!-- ================= INPUT SUMMARY ================= -->
+            {% if result.input_data %}
+            <div class="mt-4">
+                <h5>📋 Input Summary</h5>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <tbody>
+                        {% for key, value in result.input_data.items() %}
+                            <tr>
+                                <th>{{ key | replace('_', ' ') | title }}</th>
+                                <td>{{ value }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- ================= RECOMMENDATIONS ================= -->
+            <div class="mt-4">
+                <h5>💡 Recommendations</h5>
+                <div class="p-3 bg-light rounded">
+                    {% if disease == 'diabetes' and result.prediction == 1 %}
+                        <ul>
+                            <li>Consult an endocrinologist</li>
+                            <li>Monitor blood sugar regularly</li>
+                            <li>Follow a diabetic-friendly diet</li>
+                            <li>Exercise daily</li>
+                        </ul>
+                    {% elif disease == 'heart' and result.prediction == 1 %}
+                        <ul>
+                            <li>Schedule a cardiology appointment</li>
+                            <li>Monitor blood pressure</li>
+                            <li>Reduce salt and cholesterol intake</li>
+                            <li>Manage stress levels</li>
+                        </ul>
+                    {% elif disease == 'brain' and result.prediction == "Tumor Detected" %}
+                        <ul>
+                            <li>Consult a neurologist immediately</li>
+                            <li>Get advanced MRI / CT scans</li>
+                            <li>Monitor symptoms like headaches or vision issues</li>
+                            <li>Carry this report to your doctor</li>
+                        </ul>
+                    {% else %}
+                        <p class="mb-0">
+                            Continue maintaining a healthy lifestyle and regular checkups.
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- ================= ACTION BUTTONS ================= -->
+            <div class="mt-4 text-center">
+                <a href="/predict/{{ disease }}" class="btn btn-primary">🔁 New Prediction</a>
+                <a href="/chat" class="btn btn-success ms-2">🤖 Ask Chatbot</a>
+                <a href="/" class="btn btn-outline-secondary ms-2">🏠 Home</a>
+            </div>
+
+            <!-- ================= DISCLAIMER ================= -->
+            <div class="mt-4 alert alert-warning">
+                <strong>⚠️ Disclaimer:</strong>
+                This AI prediction is for educational purposes only and does not replace
+                professional medical advice. Always consult a qualified doctor.
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

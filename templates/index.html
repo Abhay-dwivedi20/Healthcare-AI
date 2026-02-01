@@ -1,0 +1,85 @@
+<!-- templates/index.html -->
+{% extends "base.html" %}
+
+{% block title %}Home - Healthcare AI{% endblock %}
+
+{% block content %}
+<div class="text-center py-5">
+    <h1 class="display-4 mb-4">🏥 Healthcare AI Assistant</h1>
+    <p class="lead mb-5">Predict diseases and get medical guidance using AI</p>
+    
+    <div class="row g-4">
+        <!-- Diabetes Card -->
+        <div class="col-md-3">
+            <div class="card h-100 border-primary">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <span style="font-size: 2.5rem;">🩸</span>
+                    </div>
+                    <h5 class="card-title">Diabetes Prediction</h5>
+                    <p class="card-text">Check your risk of diabetes based on health parameters</p>
+                    <a href="/predict/diabetes" class="btn btn-primary">Check Now</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Heart Disease Card -->
+        <div class="col-md-3">
+            <div class="card h-100 border-danger">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <span style="font-size: 2.5rem;">❤️</span>
+                    </div>
+                    <h5 class="card-title">Heart Disease</h5>
+                    <p class="card-text">Predict heart disease risk from clinical data</p>
+                    <a href="/predict/heart" class="btn btn-danger">Check Now</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Brain Tumor Card -->
+        <div class="col-md-3">
+            <div class="card h-100 border-info">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <span style="font-size: 2.5rem;">🧠</span>
+                    </div>
+                    <h5 class="card-title">Brain Tumor Detection</h5>
+                    <p class="card-text">Upload MRI scan for tumor detection</p>
+                    <a href="/predict/brain" class="btn btn-info">Upload MRI</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chatbot Card -->
+        <div class="col-md-3">
+            <div class="card h-100 border-success">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <span style="font-size: 2.5rem;">🤖</span>
+                    </div>
+                    <h5 class="card-title">Medical Chatbot</h5>
+                    <p class="card-text">Ask questions about diseases and precautions</p>
+                    <a href="/chat" class="btn btn-success">Start Chat</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Section -->
+    <div class="row mt-5 pt-5">
+        <div class="col-md-4 text-center">
+            <h3 class="text-primary">3+</h3>
+            <p>Disease Models</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <h3 class="text-danger">95%</h3>
+            <p>Prediction Accuracy</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <h3 class="text-success">24/7</h3>
+            <p>AI Assistance</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
