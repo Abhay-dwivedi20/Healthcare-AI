@@ -242,3 +242,7 @@ uploads/
 uploads/brain/
 uploads/diabetes/
 uploads/heart/
+
+venv/
+__pycache__/
+*.pkl (optional – see below)
